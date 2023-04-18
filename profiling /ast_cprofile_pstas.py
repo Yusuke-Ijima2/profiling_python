@@ -20,9 +20,8 @@ example_function()
 another_function()
 """
 
+
 # ソースコードを解析して関数名を取得するためのクラス
-
-
 class FunctionNameExtractor(ast.NodeVisitor):
     def __init__(self):
         self.function_names = []
