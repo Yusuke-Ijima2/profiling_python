@@ -1,6 +1,5 @@
 import linecache
 import line_profiler
-import os
 
 
 # 指定されたファイル名と行番号からソースコードを取得する関数
@@ -10,6 +9,7 @@ def get_source_code(filename, lineno):
 
 # 与えられたソースコードとターゲット関数を用いて、行ごとの実行時間を計測する関数
 def line_profiling(source_code, target_functions):
+    # line_profilerオブジェクトを作成
     lp = line_profiler.LineProfiler()
 
     # ターゲット関数をプロファイラに追加
@@ -25,7 +25,9 @@ def line_profiling(source_code, target_functions):
     profile_data = lp.get_stats()
 
     results = {}
+    # プロファイリング結果から関数ごとの実行時間を取得
     for (function_tuple, timings) in profile_data.timings.items():
+        # 各行の実行時間を取得
         for (line, nhits, time) in timings:
             source_line = get_source_code(function_tuple[0], line)
             results.setdefault(
