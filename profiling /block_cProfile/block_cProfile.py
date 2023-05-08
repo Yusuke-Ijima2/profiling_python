@@ -24,7 +24,7 @@ def import_source_code(file_path):
 
 
 # ソースコードのプロファイリングを行い、結果を表示する関数
-def profile_code(source_code):
+def profile_block_code(source_code):
     pr = cProfile.Profile()
     pr.enable()  # プロファイリングを開始
     source_code.main()
@@ -47,13 +47,13 @@ def profile_code(source_code):
         print(format_str.format(ncalls, tottime,
               f"{file}:{lineno}({func_name})"))
 
-        total_time = sum(tt for (_, _, tt, _, _) in ps.stats.values())
-        formatted_total_time = format_time(total_time)
-        print(f"\nTotal time: {formatted_total_time}")
+    total_time = sum(tt for (_, _, tt, _, _) in ps.stats.values())
+    formatted_total_time = format_time(total_time)
+    print(f"\nTotal time: {formatted_total_time}")
 
 
 source_code_file = "source_code.py"
 source_code = import_source_code(source_code_file)
 
 if __name__ == "__main__":
-    profile_code(source_code)
+    profile_block_code(source_code)
