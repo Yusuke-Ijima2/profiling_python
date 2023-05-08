@@ -47,6 +47,10 @@ def profile_code(source_code):
         print(format_str.format(ncalls, tottime,
               f"{file}:{lineno}({func_name})"))
 
+        total_time = sum(tt for (_, _, tt, _, _) in ps.stats.values())
+        formatted_total_time = format_time(total_time)
+        print(f"\nTotal time: {formatted_total_time}")
+
 
 source_code_file = "source_code.py"
 source_code = import_source_code(source_code_file)
