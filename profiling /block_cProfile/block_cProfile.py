@@ -4,6 +4,17 @@ from io import StringIO
 import importlib.util
 
 
+def format_time(time_in_seconds):
+    if time_in_seconds < 1e-6:
+        return f"{time_in_seconds * 1e9:.2f} ns"
+    elif time_in_seconds < 1e-3:
+        return f"{time_in_seconds * 1e6:.2f} µs"
+    elif time_in_seconds < 1:
+        return f"{time_in_seconds * 1e3:.2f} ms"
+    else:
+        return f"{time_in_seconds:.2f} s"
+
+
 # source_code.pyファイルをインポートする関数
 def import_source_code(file_path):
     spec = importlib.util.spec_from_file_location("source_code", file_path)
@@ -23,22 +34,18 @@ def profile_code(source_code):
     ps = pstats.Stats(pr, stream=s).sort_stats("cumulative")
 
     # カスタム書式で出力を整形
-    format_str = "{:<10} {:<10} {:<10} {:<10} {:<10} {}"
-    print(format_str.format("ncalls", "tottime", "percall",
-          "cumtime", "percall", "filename:lineno(function)"))
+    format_str = "{:<10} {:<15} {}"
+    print(format_str.format("ncalls", "tottime", "filename:lineno(function)"))
     print("-" * 80)
 
     for func in ps.fcn_list:
         cc, nc, tt, ct, callers = ps.stats[func]
         ncalls = f"{nc} ({cc})" if nc != cc else str(nc)
-        tottime = f"{tt:0.6f}"
-        percall = f"{tt/nc:0.6f}"
-        cumtime = f"{ct:0.6f}"
-        percall2 = f"{ct/cc:0.6f}"
+        tottime = format_time(tt)
         file, lineno, func_name = func
 
-        print(format_str.format(ncalls, tottime, percall,
-              cumtime, percall2, f"{file}:{lineno}({func_name})"))
+        print(format_str.format(ncalls, tottime,
+              f"{file}:{lineno}({func_name})"))
 
 
 source_code_file = "source_code.py"
