@@ -1,4 +1,6 @@
-# source_code.py
+# 再帰関数（フィボナッチ数列）
+
+
 def fibonacci(n):
     if n == 0:
         return 0
@@ -9,7 +11,7 @@ def fibonacci(n):
 
 
 def main():
-    print(fibonacci(20))
+    print(fibonacci(30))
 
 
 if __name__ == "__main__":
