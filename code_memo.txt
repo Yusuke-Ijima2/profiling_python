@@ -1,0 +1,48 @@
+偶数を見つける問題(リスト内包表記を使う場合)
+slow:
+def slow_code(N=10000):
+    numbers = list(range(1, N+1))
+    even_numbers = []
+    for num in numbers:
+        if num % 2 == 0:
+            even_numbers.append(num)
+    return even_numbers
+
+fast:
+def fast_code(N=10000):
+    numbers = list(range(1, N+1))
+    even_numbers = [num for num in numbers if num % 2 == 0]
+    return even_numbers
+
+---
+リスト内の重複する要素を取り除く問題(ビルトイン関数setを使う場合)
+slow:
+import random
+
+# 入力データ
+numbers = [random.randint(1, 9) for _ in range(10000)]
+
+
+# 重複要素の除去（遅い方法）
+def remove_duplicates_slow(numbers):
+    result = []
+    for num in numbers:
+        if num not in result:
+            result.append(num)
+    return result
+
+fast:
+import random
+
+# 入力データ
+numbers = [random.randint(1, 9) for _ in range(10000)]
+
+
+# 重複要素の除去（速い方法）
+def remove_duplicates_fast(numbers):
+    return list(set(numbers))
+
+---
+偶数を見つける問題 slow:13.88ms, fast:825μs 約17倍
+
+リスト内の重複する要素を取り除く問題 slow:9.27ms, fast:101μs 約92倍

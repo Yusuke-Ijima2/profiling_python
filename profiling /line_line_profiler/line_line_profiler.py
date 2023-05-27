@@ -50,8 +50,8 @@ def profile_line_code(source_code):
     return f.getvalue()
 
 
-examples = ["example1.py", "example2.py",
-            "example3.py", "example4.py", "example5.py"]
+examples = ["example1.py", "example2.py", "example3.py",
+            "example4.py", "example5.py", "example6.py"]
 
 
 print("---------------------------------------- ここから ----------------------------------------")
