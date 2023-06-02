@@ -1,0 +1,46 @@
+Module(
+    body=[
+        Assign(
+            targets=[
+                Name(id='x', ctx=Store())],
+            value=List(elts=[], ctx=Load())),
+        For(
+            target=Name(id='i', ctx=Store()),
+            iter=Call(
+                func=Name(id='range', ctx=Load()),
+                args=[
+                    Constant(value=10)],
+                keywords=[]),
+            body=[
+                Expr(
+                    value=Call(
+                        func=Attribute(
+                            value=Name(id='x', ctx=Load()),
+                            attr='append',
+                            ctx=Load()),
+                        args=[
+                            Name(id='i', ctx=Load())],
+                        keywords=[]))],
+            orelse=[])],
+    type_ignores=[])
+
+
+----------
+
+Module: 全体のPythonコードを表します。bodyリストはモジュール内のすべてのステートメント（AssignとFor）を含みます。
+
+Assign: 代入を表現するノードです。targetsリスト内のNameノードxが代入の対象で、代入する値は空のリスト（List(elts=[], ctx=Load())）です。
+
+For: forループを表現します。targetのiがループ変数で、iterのCallノードがループの範囲（range(10)）を表します。bodyリストはループ内で実行されるステートメントを含み、ここではx.append(i)があります。
+
+Call: 関数またはメソッドの呼び出しを表現します。このコードでは、range(10)とx.append(i)が該当します。
+
+Attribute: オブジェクトの属性（メソッドを含む）へのアクセスを表します。x.append(i)の呼び出しでは、リストxのappendメソッドに対応します。
+
+Name: 変数名を表現するノードです。ここでは変数xとiに対応します。
+
+Constant: 定数を表現するノードです。ここでは数値10に対応します。
+
+Expr: 式を表現します。このコードでは、x.append(i)が該当します。
+
+StoreとLoad: コンテクストを示すノードで、それぞれ代入（書き込み）と参照（読み込み）に対応します。
