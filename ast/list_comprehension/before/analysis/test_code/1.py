@@ -1,4 +1,5 @@
-x = []
+# 基本的なforループ
+nums = []
 for i in range(10):
-    if i % 2 == 0:
-        x.append(i)
+    nums.append(i)
+    # print(i)
