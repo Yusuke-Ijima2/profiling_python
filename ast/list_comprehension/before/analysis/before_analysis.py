@@ -50,10 +50,10 @@ class ListComprehensionPotentialFinder(ParentNodeTrackingAstVisitor):
         self.generic_visit(node)
 
     def visit_For(self, node):
-        # forループノードを訪れるたびに呼び出されます。
-        # forループ内に一つのステートメントだけがある場合を確認します。
-        if len(node.body) == 1:
-            statement = node.body[0]
+        # この変数は、forループ内の全てのステートメントが適切な形式（アサインメントまたはappendメソッド呼び出し）であるかをチェックし    ます。
+        all_statements_valid = True
+
+        for statement in node.body:
             # ステートメントがif文だった場合を確認します。
             if isinstance(statement, ast.If):
                 # if文内に一つのステートメントだけがある場合を確認します。
@@ -62,10 +62,21 @@ class ListComprehensionPotentialFinder(ParentNodeTrackingAstVisitor):
                     # ステートメントがappendメソッドの呼び出しだった場合、potentialフラグをTrueにします。
                     if self.is_append_call(if_body_statement):
                         self.potential = True
-            # ステートメントがif文でなく、appendメソッドの呼び出しだった場合、potentialフラグをTrueにします。
+                    else:
+                        all_statements_valid = False
+            # ステートメントがアサインメント（=）だった場合を確認します。
+            elif isinstance(statement, ast.Assign):
+                continue
+            # ステートメントがappendメソッドの呼び出しだった場合、potentialフラグをTrueにします。
             elif self.is_append_call(statement):
                 self.potential = True
-        # forループ内にさらにforループやif文があるかもしれないため、それをチェックするためにgeneric_visitを呼び出します。
+            else:
+                all_statements_valid = False
+
+        # forループ内の全てのステートメントが適切な形式でなければ、potentialフラグをFalseにします。
+        if not all_statements_valid:
+            self.potential = False
+
         self.generic_visit(node)
 
     def visit_If(self, node):
@@ -87,13 +98,16 @@ class ListComprehensionPotentialFinder(ParentNodeTrackingAstVisitor):
                     # if文内に一つのステートメントだけがある場合を確認します。
                     if len(statement.body) == 1:
                         if_body_statement = statement.body[0]
-                        # ステートメントがappendメソッドの呼び出しだった場合、potentialフラグをTrueにします。
+                        # ステートメントがappendメソッドの呼び出しだった場合、potentialフラグを    Trueにします。
                         if self.is_append_call(if_body_statement):
                             self.potential = True
-                # ステートメントがif文でなく、appendメソッドの呼び出しだった場合、potentialフラグをTrueにします。
+                # ステートメントがif文でなく、appendメソッドの呼び出しだった場合、potentialフラグを    Trueにします。
                 elif self.is_append_call(statement):
                     self.potential = True
-        # whileループ内にさらにforループやif文があるかもしれないため、それをチェックするためにgeneric_visitを呼び出します。
+                # ステートメントが副作用を持つ可能性のある関数やメソッドの呼び出し（例：print）である    場合、potentialフラグをFalseにします。
+                elif isinstance(statement, ast.Expr) and isinstance(statement.value, ast.    Call):
+                    self.potential = False
+        # whileループ内にさらにforループやif文があるかもしれないため、それをチェックするために    generic_visitを呼び出します。
         self.generic_visit(node)
 
     def is_append_call(self, statement):

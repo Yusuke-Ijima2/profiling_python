@@ -3,4 +3,5 @@ i = 0
 nums = []
 while i < 10:
     nums.append(i)
-    print(i)
+    i += 1
+    # print(i)
