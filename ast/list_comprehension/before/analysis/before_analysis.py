@@ -5,10 +5,28 @@ import ast
 # ast.NodeVisitorを継承したクラスを作成します。このクラスは、抽象構文木を訪れるためのツールとなります。
 class ListComprehensionPotentialFinder(ast.NodeVisitor):
     def __init__(self):
+        self.parent = None
         # potentialフラグは、リスト内包表記に変換可能なforループを見つけた場合にTrueとなります。
         self.potential = False
         # if-elif構造の存在を検出するフラグを追加します。
         self.has_elif = False
+        self.has_break = False
+        self.has_mismatched_continue = False
+
+    def visit(self, node):
+        if not hasattr(node, 'parent'):
+            node.parent = self.parent
+        self.parent = node
+        super().visit(node)
+        self.parent = node.parent
+
+    def visit_Break(self, node):
+        self.has_break = True
+
+    def visit_Continue(self, node):
+        # `Continue`ノードを見つけた時点で、それが`If`ノードの中にあるかどうかをチェックします。
+        if not isinstance(node.parent, ast.If):
+            self.has_mismatched_continue = True
 
     def visit_For(self, node):
         # forループノードを訪れるたびに呼び出されます。
@@ -77,7 +95,7 @@ def has_potential_for_list_comprehension(filepath):
     finder.visit(tree)
 
     # リスト内包表記に変換可能で、かつif-elif構造が存在しない場合に限りTrueを返します。
-    return finder.potential and not finder.has_elif
+    return finder.potential and not finder.has_elif and not finder.has_break and not finder.has_mismatched_continue
 
 
 # ディレクトリを指定します。
