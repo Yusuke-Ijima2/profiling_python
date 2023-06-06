@@ -2,9 +2,27 @@ import os
 import ast
 
 
-# ast.NodeVisitorを継承したクラスを作成します。このクラスは、抽象構文木を訪れるためのツールとなります。
-class ListComprehensionPotentialFinder(ast.NodeVisitor):
+class ParentNodeTrackingAstVisitor(ast.NodeVisitor):
     def __init__(self):
+        super().__init__()
+        self.parent_tracker = []  # 訪れたノードの親ノードを追跡するためのリスト
+
+    def visit(self, node):
+        super().visit(node)
+        if self.parent_tracker and self.parent_tracker[-1] is node:
+            self.parent_tracker.pop()
+
+    def generic_visit(self, node):
+        self.parent_tracker.append(node)
+        super().generic_visit(node)
+        if self.parent_tracker[-1] is node:
+            self.parent_tracker.pop()
+
+
+# ast.NodeVisitorを継承したクラスを作成します。このクラスは、抽象構文木を訪れるためのツールとなります。
+class ListComprehensionPotentialFinder(ParentNodeTrackingAstVisitor):
+    def __init__(self):
+        super().__init__()
         self.parent = None
         # potentialフラグは、リスト内包表記に変換可能なforループを見つけた場合にTrueとなります。
         self.potential = False
@@ -13,20 +31,23 @@ class ListComprehensionPotentialFinder(ast.NodeVisitor):
         self.has_break = False
         self.has_mismatched_continue = False
 
-    def visit(self, node):
-        if not hasattr(node, 'parent'):
-            node.parent = self.parent
-        self.parent = node
-        super().visit(node)
-        self.parent = node.parent
-
     def visit_Break(self, node):
         self.has_break = True
 
     def visit_Continue(self, node):
-        # `Continue`ノードを見つけた時点で、それが`If`ノードの中にあるかどうかをチェックします。
-        if not isinstance(node.parent, ast.If):
-            self.has_mismatched_continue = True
+        if len(self.parent_tracker) >= 2:
+            parent = self.parent_tracker[-1]
+            grandparent = self.parent_tracker[-2]
+            if isinstance(parent, ast.If) and isinstance(grandparent, ast.For):
+                # print("Continue文はForループ直下のIf文の中にあります")
+                self.potential = True
+            else:
+                # print("Continue文はForループ直下のIf文の中にありません")
+                self.potential = False  # continue文がForループ直下のIf文の中にない場合、potentialをFalseに設定します
+        else:
+            # print("Continue文が2つ以上の祖先ノードを持っていません")
+            self.potential = True
+        self.generic_visit(node)
 
     def visit_For(self, node):
         # forループノードを訪れるたびに呼び出されます。
