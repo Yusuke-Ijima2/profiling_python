@@ -50,7 +50,7 @@ class ListComprehensionPotentialFinder(ParentNodeTrackingAstVisitor):
         self.generic_visit(node)
 
     def visit_For(self, node):
-        # この変数は、forループ内の全てのステートメントが適切な形式（アサインメントまたはappendメソッド呼び出し）であるかをチェックし    ます。
+        # この変数は、forループ内の全てのステートメントが適切な形式（アサインメントまたはappendメソッド呼び出し）であるかをチェックします。
         all_statements_valid = True
 
         for statement in node.body:
@@ -70,6 +70,10 @@ class ListComprehensionPotentialFinder(ParentNodeTrackingAstVisitor):
             # ステートメントがappendメソッドの呼び出しだった場合、potentialフラグをTrueにします。
             elif self.is_append_call(statement):
                 self.potential = True
+            # ステートメントが関数またはメソッドの呼び出し（例：print）だった場合、potentialフラグをFalseにします。
+            elif isinstance(statement, ast.Expr) and isinstance(statement.value, ast.Call):
+                self.potential = False
+                all_statements_valid = False
             else:
                 all_statements_valid = False
 
