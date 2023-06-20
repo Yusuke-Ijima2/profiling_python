@@ -28,10 +28,10 @@ class ListComprehensionPotentialFinder(ParentNodeTrackingAstVisitor):
         self.potential = False
         # if-elif構造の存在を検出するフラグを追加します。
         self.has_elif = False
+        self.has_map_lambda = False
         self.has_break = False
         self.has_mismatched_continue = False
         self.has_non_append_call = False
-        self.has_map_lambda = False
 
     def visit_Call(self, node):
         # lambda,mapの検出
@@ -44,7 +44,16 @@ class ListComprehensionPotentialFinder(ParentNodeTrackingAstVisitor):
         self.has_break = True
 
     def visit_Continue(self, node):
-        self.has_mismatched_continue = True
+        if len(self.parent_tracker) >= 2:
+            parent = self.parent_tracker[-1]
+            grandparent = self.parent_tracker[-2]
+            if isinstance(parent, ast.If) and isinstance(grandparent, ast.For):
+                self.potential = True
+            else:
+                self.potential = False
+                self.has_mismatched_continue = True
+        else:
+            self.potential = True
         self.generic_visit(node)
 
     def visit_For(self, node):
