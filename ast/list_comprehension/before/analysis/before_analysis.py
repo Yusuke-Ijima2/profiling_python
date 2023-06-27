@@ -30,6 +30,7 @@ class ListComprehensionPotentialFinder(ParentNodeTrackingAstVisitor):
         self.has_elif = False
         self.has_map_lambda = False
         self.has_break = False
+        self.has_continue = False
         self.has_mismatched_continue = False
         self.has_non_append_call = False
 
@@ -44,17 +45,18 @@ class ListComprehensionPotentialFinder(ParentNodeTrackingAstVisitor):
         self.has_break = True
 
     def visit_Continue(self, node):
-        if len(self.parent_tracker) >= 2:
-            parent = self.parent_tracker[-1]
-            grandparent = self.parent_tracker[-2]
-            if isinstance(parent, ast.If) and isinstance(grandparent, ast.For):
-                self.potential = True
-            else:
-                self.potential = False
-                self.has_mismatched_continue = True
-        else:
-            self.potential = True
-        self.generic_visit(node)
+        self.has_continue = True
+        # if len(self.parent_tracker) >= 2:
+        #     parent = self.parent_tracker[-1]
+        #     grandparent = self.parent_tracker[-2]
+        #     if isinstance(parent, ast.If) and isinstance(grandparent, ast.For):
+        #         self.potential = True
+        #     else:
+        #         self.potential = False
+        #         self.has_mismatched_continue = True
+        # else:
+        #     self.potential = True
+        # self.generic_visit(node)
 
     def visit_For(self, node):
         all_statements_valid = True
@@ -125,7 +127,7 @@ def has_potential_for_list_comprehension(filepath):
     finder = ListComprehensionPotentialFinder()
     finder.visit(tree)
 
-    return finder.potential and not finder.has_elif and not finder.has_break and not finder.has_mismatched_continue and not finder.has_non_append_call or finder.has_map_lambda
+    return finder.potential and not finder.has_elif and not finder.has_break and not finder.has_continue and not finder.has_mismatched_continue and not finder.has_non_append_call or finder.has_map_lambda
 
 
 directory = '/Users/iijimayuusuke/Profile_yusuke_ijima/ast/list_comprehension/before/analysis/test_code'
