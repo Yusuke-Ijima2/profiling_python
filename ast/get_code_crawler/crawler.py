@@ -3,7 +3,7 @@ import random
 import os
 import time
 
-access_token = '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'
+access_token = ''
 headers = {'Authorization': f'token {access_token}'}
 minimum_lines = 100  # Minimum number of lines
 maximum_lines = 200  # Maximum number of lines
