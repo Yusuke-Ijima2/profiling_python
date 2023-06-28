@@ -1,0 +1,2 @@
+TOKEN='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'
+COMMAND=' python -u "c:\Users\suzuki\lab\profiling_python\ast\get_code_crawler\crawler.py"'
