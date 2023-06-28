@@ -5,8 +5,8 @@ import time
 
 access_token = ''
 headers = {'Authorization': f'token {access_token}'}
-minimum_lines = 100  # Minimum number of lines
-maximum_lines = 200  # Maximum number of lines
+minimum_lines = 150  # Minimum number of lines
+maximum_lines = 300  # Maximum number of lines
 directory = '/Users/iijimayuusuke/Profile_yusuke_ijima/ast/list_comprehension/before/analysis/test_code'
 num_files_needed = 50
 delay_between_requests = 5  # delay in seconds
